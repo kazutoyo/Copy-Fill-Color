@@ -36,9 +36,23 @@ var clipboard = {
 	}
 };
 
-// Retrieve layer fill color and copy to clipboard
-
 var layer = selection[0];
-var fill = layer.style().fills().firstObject();
-var fillColor = fill.color().hexValue().toString();
-clipboard.set( fillColor );
+var color;
+
+// Retrieve layer fill color and copy to clipboard
+if (layer instanceof MSShapeGroup) { // if shape object
+	var fill = layer.style().fills().firstObject();
+	if (fill) color = fill.color();
+} else if (layer instanceof MSTextLayer) { // if text object
+	color = layer.textColor();
+}
+
+if (color) {
+	var fillColor = color.hexValue().toString();
+	var alpha = Math.round(color.alpha() * 255);
+	alpha = alpha.toString(16);
+	var outStr = "#" + alpha + fillColor;
+	outStr = outStr.toUpperCase();
+
+	clipboard.set( outStr );
+}
